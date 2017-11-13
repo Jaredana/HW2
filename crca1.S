@@ -4,6 +4,7 @@ list: .space 2048
 
     .text
     .global crcInit
+    .global crcFast
 
 
 
@@ -18,7 +19,7 @@ crcInit:
 #rbp - int 128
 #r8 - int 1
 
-    mov space,%rdi
+    mov $list,%rdi
     mov $0, %rbx
     mov $0, %rdx
     mov $8, %rsi
@@ -30,7 +31,7 @@ crcInit:
     call top
 
 top:
-    test %rbx, rbp #is dividend less than 256
+    test %rbx, %rbp #is dividend less than 256
     jg end
     #remainder = dividend
 
@@ -57,8 +58,7 @@ dec %rsi
 inc %rbx
 call top
 
-
-
-
 end:
     ret
+
+crcFast:
