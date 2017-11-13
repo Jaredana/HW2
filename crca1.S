@@ -61,4 +61,38 @@ call top
 end:
     ret
 
+
+
 crcFast:
+	# Entry sequence
+	push %ebp
+	mov %ebp, %esp
+	sub %esp, 48
+	#8 bits for unsigned char data +
+	#8 bits for char remainder +
+	#32 bits for long byte = 48
+
+	# [%ebp + 8] is message, [%ebp + 16] is nBytes
+	# [%ebp - 8] is data, [%ebp - 16] is remainder, [%ebp - 48] is byte
+	mov $0x0, [%ebp - 16]
+	call topFast
+
+topFast:
+	test [%ebp - 48], [%ebp +16]
+	jg endFast
+
+	mov ([%ebp + 8], [%ebp - 48], 8), %rbx
+	xor %rbx, [%ebp - 16]
+	mov %rbx, [%ebp - 8]
+
+	mov %list, %rdi
+	mov (%rdi, [%ebp - 8], 8), [%ebp -16]
+
+	inc %[%ebp - 48]
+	call topFast
+
+endFast:
+	# Exit sequence
+	mov %esp, %ebp
+	pop %ebp
+	ret 48
